@@ -2,29 +2,66 @@ import React, { Component } from 'react'
 import NewsItem from './NewsItem'
 export default class News extends Component {
   articles = [
-   
+    
   ]
   constructor() {
 
     super();
     this.state = {
-              articles : this.articles,
+              articles : [],
               loading :false,
               page :1
     }
   }
  async componentDidMount(){
-let url ='https://newsapi.org/v2/top-headlines?country=in&apiKey=d54d5768df024b09b9e114a48f124fdc'
-let data = await fetch(url);
-let parsedData = await data.json();
-this.setState({articles : parsedData.articles})
 
-
-
+  let url =`https://newsapi.org/v2/top-headlines?country=in&apiKey=d54d5768df024b09b9e114a48f124fdc&page=1pageSize=20`
+  let data = await fetch(url);
+  let parsedData = await data.json();
+  this.setState( {
+   
+    articles : parsedData.articles ,
+ totalResults: parsedData.totalResults 
+   })
   }
-  render() {
+   handleprevClick =async ()=>{
+    let url =`https://newsapi.org/v2/top-headlines?country=in&apiKey=d54d5768df024b09b9e114a48f124fdc&page=${this.state.page-1}&pageSize=20`
+    let data = await fetch(url);
+    let parsedData = await data.json();
+  
+  
+    this.setState( {
+      page:this.state.page-1,
+      articles : parsedData.articles
+
+    })
+  }
+  handlenextClick = async () =>{
+    if (  this.state.page+1 > Math.ceil(this.state.totalResults/20)) {
+      
+    }
+    else { 
+
+      let url =`https://newsapi.org/v2/top-headlines?country=in&apiKey=d54d5768df024b09b9e114a48f124fdc&page=${this.state.page+1}&pageSize=20`
+      let data = await fetch(url);
+      let parsedData = await data.json();
+      
+      
+      this.setState( {
+        page:this.state.page+1,
+        articles : parsedData.articles
+        
+        
+      })
+    }
+    
+  }
+    
+
+    render() {
     return (
       <div className="container">
+        <h1 style={{textAlign:'center'}}>news and information</h1>
       <div className='row'>
       {this.state.articles.map((element)  => {
 
@@ -38,10 +75,11 @@ this.setState({articles : parsedData.articles})
       </div>
 
       <div className="container">
-        <button > previous </button>
-        <button >next</button>
+        <button disabled ={this.state.page<=1} onClick={this.handleprevClick} style = {{float:'left', backgroundColor:'red'}} >&larr; previous </button>
+        <button onClick={this.handlenextClick} style = {{float:'right', backgroundColor:'red'}}>&rarr; next</button>
       </div>
       </div>
     )
   }
+
 }
